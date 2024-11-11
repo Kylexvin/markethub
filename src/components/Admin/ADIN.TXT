@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminPanel.css';
 
 const AdminPanel = () => {
   const [products, setProducts] = useState([]);
   const [approvedProducts, setApprovedProducts] = useState([]);
-  const [rejectedProducts, setRejectedProducts] = useState([]);
+  const [rejectedProducts, setRejectedProducts] = useState([]);  // New state for rejected products
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -13,25 +13,26 @@ const AdminPanel = () => {
   const [usersPerPage] = useState(10);
   const navigate = useNavigate();
 
+  // Fetch pending, approved, and rejected products and users
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/pending', {
+        const productResponse = await fetch('http://localhost:5000/api/admin/products/pending', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const approvedProductResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/approved', {
+        const approvedProductResponse = await fetch('http://localhost:5000/api/admin/products/approved', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const rejectedProductResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/rejected', {
+        const rejectedProductResponse = await fetch('http://localhost:5000/api/admin/products/rejected', {  // Fetch rejected products
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const userResponse = await fetch('https://markethubbackend.onrender.com/api/admin/users', {
+        const userResponse = await fetch('http://localhost:5000/api/admin/users', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -39,12 +40,12 @@ const AdminPanel = () => {
 
         const productData = await productResponse.json();
         const approvedProductData = await approvedProductResponse.json();
-        const rejectedProductData = await rejectedProductResponse.json();
+        const rejectedProductData = await rejectedProductResponse.json();  // Set rejected products
         const userData = await userResponse.json();
 
         setProducts(productData);
         setApprovedProducts(approvedProductData);
-        setRejectedProducts(rejectedProductData);
+        setRejectedProducts(rejectedProductData);  // Update rejected products
         setUsers(userData);
       } catch (err) {
         setError('Failed to fetch data. Please try again later.');
@@ -56,9 +57,10 @@ const AdminPanel = () => {
     fetchData();
   }, []);
 
+  // Product Approval Functions
   const handleApprove = async (productId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
+      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -74,7 +76,8 @@ const AdminPanel = () => {
 
   const handleReject = async (productId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
+      // Revert the product status to rejected
+      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -82,53 +85,19 @@ const AdminPanel = () => {
         },
         body: JSON.stringify({ approvalStatus: 'rejected' }),
       });
-      const rejectedProduct = approvedProducts.find(p => p._id === productId);
-      if (rejectedProduct) {
-        setRejectedProducts([...rejectedProducts, rejectedProduct]);
-        setApprovedProducts(approvedProducts.filter((product) => product._id !== productId));
-      }
+      // Remove it from the approved products state and add to rejected products
+      setApprovedProducts(approvedProducts.filter((product) => product._id !== productId));
+      setRejectedProducts([...rejectedProducts, products.find(product => product._id === productId)]);
+      setProducts(products.filter((product) => product._id !== productId));
     } catch (err) {
       setError('Failed to reject product. Please try again.');
     }
   };
 
-  const handleDelete = async (productId) => {
-    try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      setRejectedProducts(rejectedProducts.filter((product) => product._id !== productId));
-    } catch (err) {
-      setError('Failed to delete product. Please try again.');
-    }
-  };
-
-  const handleReapprove = async (productId) => {
-    try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ approvalStatus: 'approved' }),
-      });
-      const reapprovedProduct = rejectedProducts.find(p => p._id === productId);
-      if (reapprovedProduct) {
-        setApprovedProducts([...approvedProducts, reapprovedProduct]);
-        setRejectedProducts(rejectedProducts.filter((product) => product._id !== productId));
-      }
-    } catch (err) {
-      setError('Failed to reapprove product. Please try again.');
-    }
-  };
-
+  // User Management Functions
   const handleGrantAdmin = async (userId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/users/${userId}/grant-admin`, {
+      await fetch(`http://localhost:5000/api/admin/users/${userId}/grant-admin`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -145,7 +114,7 @@ const AdminPanel = () => {
 
   const handleBanUser = async (userId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/users/${userId}/ban`, {
+      await fetch(`http://localhost:5000/api/admin/users/${userId}/ban`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -160,7 +129,7 @@ const AdminPanel = () => {
 
   const handleRemoveUser = async (userId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/users/${userId}`, {
+      await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -172,6 +141,7 @@ const AdminPanel = () => {
     }
   };
 
+  // Pagination logic
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
@@ -199,13 +169,14 @@ const AdminPanel = () => {
         </div>
       )}
 
+      {/* Summary Information */}
       <div className="summary-container">
         <div className="summary-item">
           <h3><i className="fas fa-user"></i> Total Users</h3>
           <p>{users.length}</p>
         </div>
         <div className="summary-item">
-          <h3><i className="fas fa-clock"></i> Pending Products</h3>
+          <h3>Pending Products</h3>
           <p>{products.length}</p>
         </div>
         <div className="summary-item">
@@ -213,11 +184,12 @@ const AdminPanel = () => {
           <p>{approvedProducts.length}</p>
         </div>
         <div className="summary-item">
-          <h3>Rejected Products</h3>
+          <h3>Rejected Products</h3> {/* Display rejected products count */}
           <p>{rejectedProducts.length}</p>
         </div>
       </div>
 
+      {/* Product Approval Section */}
       <div className="product-approval">
         <h2>Pending Product Approvals</h2>
 
@@ -231,7 +203,7 @@ const AdminPanel = () => {
               <div key={product._id} className="product-cardd">
                 <div className="product-image">
                   <img
-                    src={`https://markethubbackend.onrender.com/${product.image}`}
+                    src={`http://localhost:5000/${product.image}`}
                     alt={product.name}
                   />
                 </div>
@@ -253,13 +225,13 @@ const AdminPanel = () => {
                     onClick={() => handleApprove(product._id)}
                     className="approve-btn"
                   >
-                  <i className="fas fa-check"></i>  Approve
+                    <i className="fas fa-check"></i> Approve
                   </button>
                   <button 
                     onClick={() => handleReject(product._id)}
                     className="reject-btn"
                   >
-                  <i className="fas fa-times"></i>  Reject
+                    <i className="fas fa-times"></i> Reject
                   </button>
                   <div className="contact-seller">
                     <a 
@@ -268,7 +240,7 @@ const AdminPanel = () => {
                       rel="noopener noreferrer"
                       className="contact-seller-btn"
                     >
-                     <i className="fab fa-whatsapp"></i>   Contact Seller
+                      <i className="fab fa-whatsapp"></i> Contact Seller
                     </a>
                   </div>
                 </div>
@@ -278,6 +250,7 @@ const AdminPanel = () => {
         )}
       </div>
 
+      {/* Approved Products Section */}
       <div className="approved-products">
         <h2>Approved Products</h2>
 
@@ -288,30 +261,22 @@ const AdminPanel = () => {
         ) : (
           <div className="products-grid">
             {approvedProducts.map((product) => (
-              <div key={product._id} className="product-cardd">
+              <div key={product._id} className="product-card">
                 <div className="product-image">
                   <img
-                    src={`https://markethubbackend.onrender.com/${product.image}`}
+                    src={`http://localhost:5000/${product.image}`}
                     alt={product.name}
                   />
                 </div>
-                <div className="product-detailss">
+                <div className="product-details">
                   <h3>{product.name}</h3>
-                  <p className="pricee">
+                  <p className="price">
                     ${product.price.toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
                   </p>
-                  <p className="descriptionn">{product.description}</p>
-                </div>
-                <div className="product-actions">
-                  <button 
-                    onClick={() => handleReject(product._id)}
-                    className="reject-btn"
-                  >
-                   <i className="fas fa-times"></i>  Reject
-                  </button>
+                  <p className="description">{product.description}</p>
                 </div>
               </div>
             ))}
@@ -319,46 +284,33 @@ const AdminPanel = () => {
         )}
       </div>
 
+      {/* Rejected Products Section */}
       <div className="rejected-products">
         <h2>Rejected Products</h2>
 
         {rejectedProducts.length === 0 ? (
           <div className="empty-state">
-            <p>No rejected products</p>
+            <p>No rejected products available</p>
           </div>
         ) : (
           <div className="products-grid">
             {rejectedProducts.map((product) => (
-              <div key={product._id} className="product-cardd">
+              <div key={product._id} className="product-card">
                 <div className="product-image">
                   <img
-                    src={`https://markethubbackend.onrender.com/${product.image}`}
+                    src={`http://localhost:5000/${product.image}`}
                     alt={product.name}
                   />
                 </div>
-                <div className="product-detailss">
+                <div className="product-details">
                   <h3>{product.name}</h3>
-                  <p className="pricee">
+                  <p className="price">
                     ${product.price.toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
                   </p>
-                  <p className="descriptionn">{product.description}</p>
-                </div>
-                <div className="product-actions">
-                  <button 
-                    onClick={() => handleReapprove(product._id)}
-                    className="approve-btn"
-                  >
-                    <i className="fas fa-check"></i> Reapprove
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(product._id)}
-                    className="delete-btn"
-                  >
-                    <i className="fas fa-trash-alt"></i> Delete
-                  </button>
+                  <p className="description">{product.description}</p>
                 </div>
               </div>
             ))}
@@ -366,54 +318,57 @@ const AdminPanel = () => {
         )}
       </div>
 
+      {/* User Management Section */}
       <div className="user-management">
         <h2>Manage Users</h2>
-
-        {currentUsers.length === 0 ? (
-          <div className="empty-state">
-            <p>No users to manage</p>
-          </div>
-        ) : (
-          <div className="users-grid">
+        <table className="user-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
             {currentUsers.map((user) => (
-              <div key={user._id} className="user-card">
-                <div className="user-details">
-                  <h3>{user.username}</h3>
-                  <p>Email: {user.email}</p>
-                  <p>Role: {user.role}</p>
-                </div>
-                <div className="user-actions">
+              <tr key={user._id}>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+                <td>{user.role}</td>
+                <td>
                   {user.role !== 'admin' && (
                     <button 
-                      onClick={() => handleGrantAdmin(user._id)} 
                       className="grant-admin-btn"
+                      onClick={() => handleGrantAdmin(user._id)}
                     >
-                     <i className="fas fa-user-shield"></i>  Grant Admin
+                      Grant Admin
                     </button>
                   )}
                   <button 
-                    onClick={() => handleBanUser(user._id)} 
                     className="ban-btn"
+                    onClick={() => handleBanUser(user._id)}
                   >
-                  <i className="fas fa-ban"></i> Ban
+                    Ban
                   </button>
                   <button 
-                    onClick={() => handleRemoveUser(user._id)} 
                     className="remove-btn"
+                    onClick={() => handleRemoveUser(user._id)}
                   >
-                  <i className="fas fa-trash-alt"></i>  Remove
+                    Remove
                   </button>
-                </div>
-              </div>
+                </td>
+              </tr>
             ))}
-          </div>
-        )}
+          </tbody>
+        </table>
 
+        {/* Pagination */}
         <div className="pagination">
           {Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, index) => (
-            <button 
-              key={index} 
-              onClick={() => paginate(index + 1)} 
+            <button
+              key={index + 1}
+              onClick={() => paginate(index + 1)}
               className={currentPage === index + 1 ? 'active' : ''}
             >
               {index + 1}
