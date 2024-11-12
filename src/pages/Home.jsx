@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/home.css';
 import Footer from '../components/Footer';
 
-// Helper function to format relative time
 const getRelativeTime = (date) => {
   const seconds = Math.floor((new Date() - new Date(date)) / 1000);
   const intervals = [
@@ -25,9 +24,9 @@ const getRelativeTime = (date) => {
   return "just now";
 };
 
-// Product Card Component
 const ProductCard = ({ product, contactSeller }) => {
   const [relativeTime, setRelativeTime] = useState(getRelativeTime(product.createdAt));
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -40,14 +39,22 @@ const ProductCard = ({ product, contactSeller }) => {
   return (
     <div className="product-card" key={product._id}>
       <div className="product-image">
-        <img src={`https://markethubbackend.onrender.com/${product.image.replace("\\", "/")}`} alt={product.name} />
+        <img
+          src={`https://markethubbackend.onrender.com/${product.image.replace(/\\/g, "/")}`}
+          alt={product.name}
+          onLoad={() => setImageLoaded(true)}
+          onError={(e) => {
+            e.target.src = "/fallback-image.jpg";
+          }}
+          style={{ opacity: imageLoaded ? 1 : 0.5, transition: 'opacity 0.5s ease-in-out' }}
+        />
       </div>
+
       <div className="product-info">
         <div className="price-row">
           <div className="product-price">
             <i className="fas fa-tag"></i> Price Ksh {product.price.toLocaleString()}
           </div>
-          {/* Display relative time */}
           <div className="timestamp">
             <i className="fas fa-clock"></i> <b>Posted</b> {relativeTime}
           </div>
@@ -57,12 +64,9 @@ const ProductCard = ({ product, contactSeller }) => {
           <p className="product-description">{product.description}</p>
         </div>
         <div className="seller-info">
-          <div className="seller-details">
           <div className="seller-name">
-  <i className="fas fa-user"></i> <b>Seller:</b>
-  {product.sellerId ? product.sellerId.username || product.sellerId.phone : 'Unknown Seller'}
-</div>
-
+            <i className="fas fa-user"></i> <b>Seller:</b>
+            {product.sellerId ? product.sellerId.username || product.sellerId.phone : 'Unknown Seller'}
           </div>
         </div>
         <button className="contact-btn" onClick={() => contactSeller(product.sellerWhatsApp)}>
@@ -110,7 +114,7 @@ const Home = () => {
                 <i className="fas fa-sign-in-alt"></i> Login
               </button>
               <button className="nav-btn register-btn" onClick={() => navigate('/register')}>
-                 Register
+                Register
               </button>
             </div>
           </div>
@@ -145,16 +149,10 @@ const Home = () => {
                 <ProductCard key={product._id} product={product} contactSeller={contactSeller} />
               ))
             ) : (
-              <>
-                <p>No products available at the moment. Become a seller now</p>
-                <button className="nav-btn register-btn" onClick={() => navigate('/register')}>
-                  <i className="fas fa-plus-circle"></i> Start Selling Today
-                </button>
-              </>
+              <p>No products available at the moment. Become a seller now</p>
             )}
           </div>
         </div>
-
       </div>
       <Footer />
     </>

@@ -100,12 +100,10 @@ const AdminPanel = () => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
             },
         });
-
+        
         if (response.ok) {
             // Update the state to remove the deleted product
-            setRejectedProducts(prevState => prevState.filter(product => product._id !== productId));
-            // Optional: re-fetch the list of rejected products from the server
-            fetchRejectedProducts(); // Implement fetchRejectedProducts to update the full list.
+            setProducts(products.filter(product => product._id !== productId));
         } else {
             console.error('Failed to delete product');
         }
@@ -113,7 +111,6 @@ const AdminPanel = () => {
         console.error('Error deleting product:', error);
     }
 };
-
 
 
   const handleReapprove = async (productId) => {
