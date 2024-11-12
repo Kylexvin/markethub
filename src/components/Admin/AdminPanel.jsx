@@ -94,17 +94,27 @@ const AdminPanel = () => {
 
   const handleDelete = async (productId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      setRejectedProducts(rejectedProducts.filter((product) => product._id !== productId));
-    } catch (err) {
-      setError('Failed to delete product. Please try again.');
+        const response = await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        if (response.ok) {
+            // Update the state to remove the deleted product
+            setRejectedProducts(prevState => prevState.filter(product => product._id !== productId));
+            // Optional: re-fetch the list of rejected products from the server
+            fetchRejectedProducts(); // Implement fetchRejectedProducts to update the full list.
+        } else {
+            console.error('Failed to delete product');
+        }
+    } catch (error) {
+        console.error('Error deleting product:', error);
     }
-  };
+};
+
+
 
   const handleReapprove = async (productId) => {
     try {
