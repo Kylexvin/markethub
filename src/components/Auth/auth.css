@@ -71,18 +71,30 @@ label {
 
 /* Input icon container */
 .input-icon {
+  display: flex;
+  align-items: center;
   position: relative;
 }
 
-.icon {
+.input-icon .icon {
   position: absolute;
-  left: 12px; /* Adjust as needed */
-  top: 50%;
-  transform: translateY(-50%);
-  color: #888;
-  font-size: 1rem;
+  left: 10px;
+  color: #888; /* Adjust as needed */
 }
 
+.form-input {
+  padding-left: 30px; /* Add padding to avoid text overlapping with the icon */
+  width: 100%;
+}
+.password-input .toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  right: 10px;
+  font-size: 1rem;
+  color: #888;
+}
 /* Password toggle button */
 .password-input {
   display: flex;
@@ -152,4 +164,33 @@ label {
 
 .switch-auth a:hover {
   text-decoration: underline;
+}
+.toggle-password {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #007bff;
+  padding: 0 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password:disabled {
+  color: #ddd;
+  cursor: not-allowed;
+}
+
+.password-input {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.password-input .form-input {
+  flex-grow: 1;
+  border: none;
+  padding-left: 0.75rem;
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './seller.css';
+import Footer from '../Footer';
 
 function SellerDashboard() {
   const [formData, setFormData] = useState({
@@ -12,6 +13,7 @@ function SellerDashboard() {
   const [responseMessage, setResponseMessage] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false); // Uploading state
   const [showUploadForm, setShowUploadForm] = useState(false);
   const username = localStorage.getItem('username');
 
@@ -24,6 +26,14 @@ function SellerDashboard() {
   // Handle file input change (image upload)
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+
+    // Check if file size exceeds 3MB
+    if (file && file.size > 3 * 1024 * 1024) {
+      setResponseMessage('File size should not exceed 3MB');
+      setFormData(prevData => ({ ...prevData, image: null }));
+      return;
+    }
+
     setFormData(prevData => ({ ...prevData, image: file }));
   };
 
@@ -41,6 +51,9 @@ function SellerDashboard() {
     }
 
     try {
+      setIsUploading(true); // Start uploading indicator
+      setResponseMessage('');
+
       // Send the product upload request with the token
       const token = localStorage.getItem('token');
       const response = await axios.post('https://markethubbackend.onrender.com/api/products/upload', data, {
@@ -50,6 +63,7 @@ function SellerDashboard() {
         }
       });
       setResponseMessage(response.data.message);
+
       // Clear form after successful upload
       setFormData({
         name: '',
@@ -63,6 +77,8 @@ function SellerDashboard() {
     } catch (error) {
       setResponseMessage(error.response?.data?.message || 'Error uploading product');
       console.error('Upload error:', error);
+    } finally {
+      setIsUploading(false); // Stop uploading indicator
     }
   };
 
@@ -106,16 +122,25 @@ function SellerDashboard() {
   }, []);
 
   return (
+    <>
     <div className="seller-dashboard">
       <div className="dashboard-header">
        <h1 className="dashboard-title">Welcome To Seller's Dashboard!{/* Display username here just as we fetch sellers */}</h1>
        
-        <button
-          className={`upload-btn ${showUploadForm ? 'btn-close' : 'btn-open'}`}
-          onClick={() => setShowUploadForm(!showUploadForm)}
-        >
-          {showUploadForm ? 'Close' : 'Upload Product'}
-        </button>
+       <button
+         className={`upload-btn ${showUploadForm ? 'btn-close' : 'btn-open'}`}
+         onClick={() => setShowUploadForm(!showUploadForm)}
+       >
+         {showUploadForm ? (
+           <>
+             Close <i className="fas fa-chevron-up"></i>
+           </>
+         ) : (
+           <>
+             Upload Product <i className="fas fa-chevron-down"></i>
+           </>
+         )}
+       </button>
       </div>
 
       {showUploadForm && (
@@ -171,7 +196,9 @@ function SellerDashboard() {
               />
             </div>
 
-            <button type="submit" className="btn btn-primary">Upload Product</button>
+            <button type="submit" className="btn btn-primary" disabled={isUploading}>
+              {isUploading ? 'Uploading...' : 'Upload Product'}
+            </button>
           </form>
         </div>
       )}
@@ -191,7 +218,7 @@ function SellerDashboard() {
               <div className="product-card" key={product._id}>
                 <h3 className="product-title">{product.name}</h3>
                 <p className="product-description">{product.description}</p>
-                <p className="product-price">Price: ${product.price}</p>
+                <p className="product-price">Price: Ksh {product.price}</p>
                 <p className="product-status">Status: {product.approvalStatus}</p>
                 <button className="btn btn-danger" onClick={() => deleteProduct(product._id)}>
                   Delete
@@ -204,6 +231,8 @@ function SellerDashboard() {
         )}
       </div>
     </div>
+    <Footer/>
+    </>
   );
 }
 

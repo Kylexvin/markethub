@@ -104,14 +104,15 @@ const Login = () => {
                 required
                 className="form-input"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="toggle-password"
-                disabled={loading}
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
+            <button
+  type="button"
+  onClick={() => setShowPassword(!showPassword)}
+  className="toggle-password"
+  disabled={loading}
+>
+  <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`} />
+</button>
+
             </div>
           </div>
 

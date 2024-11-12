@@ -6,7 +6,7 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
-    phone: '',
+    phone: '254', // Prefill with '254'
     email: '',
     password: ''
   });
@@ -15,21 +15,27 @@ const Register = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+
+    // Update phone number, ensuring it always starts with '254'
+    if (name === "phone") {
+      const sanitizedValue = value.replace(/\D/g, ""); // Remove non-numeric characters
+      const formattedPhone = sanitizedValue.startsWith("254")
+        ? sanitizedValue
+        : `254${sanitizedValue.slice(3)}`; // Prevent users from altering '254'
+      
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: formattedPhone,
+      }));
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    }
   };
-  if (typeof window !== "undefined") {
-    const resizeObserverLoopErr = () => {};
-    window.addEventListener("error", (e) => {
-      if (e.message === "ResizeObserver loop limit exceeded") {
-        e.stopImmediatePropagation();
-        resizeObserverLoopErr();
-      }
-    });
-  }
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -48,7 +54,7 @@ const Register = () => {
 
       if (response.ok) {
         setMessage(`Registration successful! Welcome, ${formData.username}. You can now log in.`);
-        setFormData({ username: '', phone: '', email: '', password: '' });
+        setFormData({ username: '', phone: '254', email: '', password: '' });
         
         setTimeout(() => {
           navigate('/login');
@@ -78,12 +84,11 @@ const Register = () => {
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <div className="input-icon">
-              <i className="fas fa-user icon"></i>
               <input
                 id="username"
                 name="username"
                 type="text"
-                placeholder="   Enter your username"
+                placeholder="Enter your username"
                 onChange={handleChange}
                 value={formData.username}
                 disabled={loading}
@@ -97,12 +102,11 @@ const Register = () => {
           <div className="form-group">
             <label htmlFor="phone">Phone Number</label>
             <div className="input-icon">
-              <i className="fas fa-phone icon"></i>
               <input
                 id="phone"
                 name="phone"
                 type="tel"
-                placeholder="    Enter your phone number"
+                placeholder="254"
                 onChange={handleChange}
                 value={formData.phone}
                 disabled={loading}
@@ -116,12 +120,11 @@ const Register = () => {
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <div className="input-icon">
-              <i className="fas fa-envelope icon"></i>
               <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="    Enter your email"
+                placeholder="Enter your email"
                 onChange={handleChange}
                 value={formData.email}
                 disabled={loading}
@@ -135,7 +138,6 @@ const Register = () => {
           <div className="form-group">
             <label htmlFor="password">Password</label>
             <div className="password-input input-icon">
-              <i className="fas fa-lock icon"></i>
               <input
                 id="password"
                 name="password"
@@ -169,7 +171,6 @@ const Register = () => {
 
           {/* Login Link */}
           <div className="welcome-back">
-            <h3>Welcome Back!</h3>
             <p className="switch-auth">
               Already have an account?{' '}
               <a href="/login">Sign in</a>{' '}
