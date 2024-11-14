@@ -56,7 +56,7 @@ function SellerDashboard() {
 
       // Send the product upload request with the token
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5000/api/products/upload', data, {
+      const response = await axios.post('https://markethubbackend.onrender.com/api/products/upload', data, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -86,7 +86,7 @@ function SellerDashboard() {
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/seller/products', {
+      const response = await axios.get('https://markethubbackend.onrender.com/api/seller/products', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -103,7 +103,7 @@ function SellerDashboard() {
   const deleteProduct = async (productId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.delete(`http://localhost:5000/api/products/delete/${productId}`, {
+      const response = await axios.delete(`https://markethubbackend.onrender.com/api/products/delete/${productId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

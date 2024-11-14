@@ -16,22 +16,22 @@ const AdminPanel = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productResponse = await fetch('http://localhost:5000/api/admin/products/pending', {
+        const productResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/pending', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const approvedProductResponse = await fetch('http://localhost:5000/api/admin/products/approved', {
+        const approvedProductResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/approved', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const rejectedProductResponse = await fetch('http://localhost:5000/api/admin/products/rejected', {
+        const rejectedProductResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/rejected', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const userResponse = await fetch('http://localhost:5000/api/admin/users', {
+        const userResponse = await fetch('https://markethubbackend.onrender.com/api/admin/users', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -59,7 +59,7 @@ const AdminPanel = () => {
   // Function to delete all rejected products
   const deleteAllRejected = async () => {
     try {
-      await fetch('http://localhost:5000/api/admin/products/rejected', {
+      await fetch('https://markethubbackend.onrender.com/api/admin/products/rejected', {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -74,7 +74,7 @@ const AdminPanel = () => {
   };
   const handleApprove = async (productId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -90,7 +90,7 @@ const AdminPanel = () => {
 
   const handleReject = async (productId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -110,7 +110,7 @@ const AdminPanel = () => {
 
   const handleDelete = async (productId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -124,7 +124,7 @@ const AdminPanel = () => {
 
   const handleReapprove = async (productId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -144,7 +144,7 @@ const AdminPanel = () => {
 
   const handleGrantAdmin = async (userId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/users/${userId}/grant-admin`, {
+      await fetch(`https://markethubbackend.onrender.com/api/admin/users/${userId}/grant-admin`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -161,7 +161,7 @@ const AdminPanel = () => {
 
   const handleBanUser = async (userId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/users/${userId}/ban`, {
+      await fetch(`https://markethubbackend.onrender.com/api/admin/users/${userId}/ban`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -176,7 +176,7 @@ const AdminPanel = () => {
 
   const handleRemoveUser = async (userId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+      await fetch(`https://markethubbackend.onrender.com/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -250,7 +250,7 @@ const AdminPanel = () => {
               <div key={product._id} className="product-cardd">
                 <div className="product-image">
                   <img
-                    src={`http://localhost:5000/${product.image}`}
+                    src={`https://markethubbackend.onrender.com/${product.image}`}
                     alt={product.name}
                   />
                 </div>
@@ -310,7 +310,7 @@ const AdminPanel = () => {
               <div key={product._id} className="product-cardd">
                 <div className="product-image">
                   <img
-                    src={`http://localhost:5000/${product.image}`}
+                    src={`https://markethubbackend.onrender.com/${product.image}`}
                     alt={product.name}
                   />
                 </div>

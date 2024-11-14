@@ -40,7 +40,7 @@ const ProductCard = ({ product, contactSeller }) => {
     <div className="product-card" key={product._id}>
      <div className="product-image">
   <img
-    src={`http://localhost:5000/${product.image.replace(/\\/g, "/")}`}
+    src={`https://markethubbackend.onrender.com/${product.image.replace(/\\/g, "/")}`}
     alt={product.name}
     onLoad={() => setImageLoaded(true)}
     onError={(e) => {
@@ -87,7 +87,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/products/approved');
+        const response = await axios.get('https://markethubbackend.onrender.com/api/products/approved');
         setProducts(response.data);
       } catch (err) {
         setError('Failed to load products. Please try again later.');
