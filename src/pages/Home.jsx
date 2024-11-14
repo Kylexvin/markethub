@@ -38,17 +38,18 @@ const ProductCard = ({ product, contactSeller }) => {
 
   return (
     <div className="product-card" key={product._id}>
-      <div className="product-image">
-        <img
-          src={`https://markethubbackend.onrender.com/${product.image.replace(/\\/g, "/")}`}
-          alt={product.name}
-          onLoad={() => setImageLoaded(true)}
-          onError={(e) => {
-            e.target.src = "/fallback-image.jpg";
-          }}
-          style={{ opacity: imageLoaded ? 1 : 0.5, transition: 'opacity 0.5s ease-in-out' }}
-        />
-      </div>
+     <div className="product-image">
+  <img
+    src={`http://localhost:5000/${product.image.replace(/\\/g, "/")}`}
+    alt={product.name}
+    onLoad={() => setImageLoaded(true)}
+    onError={(e) => {
+      e.target.src = "/fallback-image.jpg"; // Ensure this path is accessible
+    }}
+    className={imageLoaded ? "image-loaded" : "image-loading"}
+  />
+</div>
+
 
       <div className="product-info">
         <div className="price-row">
@@ -70,7 +71,7 @@ const ProductCard = ({ product, contactSeller }) => {
           </div>
         </div>
         <button className="contact-btn" onClick={() => contactSeller(product.sellerWhatsApp)}>
-          <i className="fab fa-whatsapp"></i> Contact Seller via WhatsApp
+          <i className="fab fa-whatsapp"></i> Contact Seller
         </button>
       </div>
     </div>
@@ -86,7 +87,7 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('https://markethubbackend.onrender.com/api/products/approved');
+        const response = await axios.get('http://localhost:5000/api/products/approved');
         setProducts(response.data);
       } catch (err) {
         setError('Failed to load products. Please try again later.');

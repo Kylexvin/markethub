@@ -21,12 +21,9 @@ body {
 }
 
 .nav-content {
-  max-width: 1200px;
-  margin: 0 auto;
   display: flex;
-  justify-content: space-evenly;
-
-  /* align-items: center; */
+  justify-content: space-between; /* Pushes items to the far ends */
+  align-items: center;
 }
 
 .logo {

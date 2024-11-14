@@ -16,22 +16,22 @@ const AdminPanel = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/pending', {
+        const productResponse = await fetch('http://localhost:5000/api/admin/products/pending', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const approvedProductResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/approved', {
+        const approvedProductResponse = await fetch('http://localhost:5000/api/admin/products/approved', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const rejectedProductResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/rejected', {
+        const rejectedProductResponse = await fetch('http://localhost:5000/api/admin/products/rejected', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const userResponse = await fetch('https://markethubbackend.onrender.com/api/admin/users', {
+        const userResponse = await fetch('http://localhost:5000/api/admin/users', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -56,9 +56,25 @@ const AdminPanel = () => {
     fetchData();
   }, []);
 
+  // Function to delete all rejected products
+  const deleteAllRejected = async () => {
+    try {
+      await fetch('http://localhost:5000/api/admin/products/rejected', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      setRejectedProducts([]);
+      setProducts(products.filter(product => product.status !== 'rejected'));
+    } catch (err) {
+      console.error('Failed to delete rejected products:', err);
+    }
+  };
   const handleApprove = async (productId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
+      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -74,7 +90,7 @@ const AdminPanel = () => {
 
   const handleReject = async (productId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
+      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -94,28 +110,21 @@ const AdminPanel = () => {
 
   const handleDelete = async (productId) => {
     try {
-        const response = await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
-            method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-        });
-        
-        if (response.ok) {
-            // Update the state to remove the deleted product
-            setProducts(products.filter(product => product._id !== productId));
-        } else {
-            console.error('Failed to delete product');
-        }
-    } catch (error) {
-        console.error('Error deleting product:', error);
+      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setRejectedProducts(rejectedProducts.filter((product) => product._id !== productId));
+    } catch (err) {
+      setError('Failed to delete product. Please try again.');
     }
-};
-
+  };
 
   const handleReapprove = async (productId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
+      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -135,7 +144,7 @@ const AdminPanel = () => {
 
   const handleGrantAdmin = async (userId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/users/${userId}/grant-admin`, {
+      await fetch(`http://localhost:5000/api/admin/users/${userId}/grant-admin`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -152,7 +161,7 @@ const AdminPanel = () => {
 
   const handleBanUser = async (userId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/users/${userId}/ban`, {
+      await fetch(`http://localhost:5000/api/admin/users/${userId}/ban`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -167,7 +176,7 @@ const AdminPanel = () => {
 
   const handleRemoveUser = async (userId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin/users/${userId}`, {
+      await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -206,25 +215,28 @@ const AdminPanel = () => {
         </div>
       )}
 
-      <div className="summary-container">
-        <div className="summary-item">
-          <h3><i className="fas fa-user"></i> Total Users</h3>
-          <p>{users.length}</p>
-        </div>
-        <div className="summary-item">
-          <h3><i className="fas fa-clock"></i> Pending Products</h3>
-          <p>{products.length}</p>
-        </div>
-        <div className="summary-item">
-          <h3>Approved Products</h3>
-          <p>{approvedProducts.length}</p>
-        </div>
-        <div className="summary-item">
-          <h3>Rejected Products</h3>
-          <p>{rejectedProducts.length}</p>
-        </div>
+<div className="summary-container">
+      <div className="summary-item">
+        <h3><i className="fas fa-user"></i> Total Users</h3>
+        <p>{users.length}</p>
       </div>
-
+      <div className="summary-item">
+        <h3><i className="fas fa-clock"></i> Pending Products</h3>
+        <p>{products.length}</p>
+      </div>
+      <div className="summary-item">
+        <h3><i class="fa-solid fa-check"></i> Approved Products</h3>
+        <p>{approvedProducts.length}</p>
+      </div>
+      <div className="summary-item">
+        <h3>Rejected Products</h3>
+        <p>{rejectedProducts.length}</p>
+        <button onClick={deleteAllRejected} className="delete-button">
+        <i className="fas fa-trash-alt"></i> Delete All Rejected
+        </button>
+      </div>
+     </div>
+   
       <div className="product-approval">
         <h2>Pending Product Approvals</h2>
 
@@ -238,7 +250,7 @@ const AdminPanel = () => {
               <div key={product._id} className="product-cardd">
                 <div className="product-image">
                   <img
-                    src={`https://markethubbackend.onrender.com/${product.image}`}
+                    src={`http://localhost:5000/${product.image}`}
                     alt={product.name}
                   />
                 </div>
@@ -251,7 +263,7 @@ const AdminPanel = () => {
                     })}
                   </p>
                   <p className="descriptionn">{product.description}</p>
-                  <p className="whatsapp-number">
+                  <p className="descriptionn">
                     WhatsApp: {product.sellerWhatsApp}
                   </p>
                 </div>
@@ -298,7 +310,7 @@ const AdminPanel = () => {
               <div key={product._id} className="product-cardd">
                 <div className="product-image">
                   <img
-                    src={`https://markethubbackend.onrender.com/${product.image}`}
+                    src={`http://localhost:5000/${product.image}`}
                     alt={product.name}
                   />
                 </div>
@@ -326,7 +338,7 @@ const AdminPanel = () => {
         )}
       </div>
 
-      <div className="rejected-products">
+      {/* <div className="rejected-products">
         <h2>Rejected Products</h2>
 
         {rejectedProducts.length === 0 ? (
@@ -339,7 +351,7 @@ const AdminPanel = () => {
               <div key={product._id} className="product-cardd">
                 <div className="product-image">
                   <img
-                    src={`https://markethubbackend.onrender.com/${product.image}`}
+                    src={`http://localhost:5000/${product.image}`}
                     alt={product.name}
                   />
                 </div>
@@ -371,7 +383,7 @@ const AdminPanel = () => {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
       <div className="user-management">
         <h2>Manage Users</h2>
