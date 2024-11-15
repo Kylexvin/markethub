@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/home.css';
@@ -24,32 +24,119 @@ const getRelativeTime = (date) => {
   return "just now";
 };
 
+// Function to cache image as base64
+const cacheImage = async (url) => {
+  try {
+    // Check if image is already cached
+    const cachedImage = localStorage.getItem(url);
+    if (cachedImage) {
+      return cachedImage;
+    }
+
+    // Fetch and cache new image
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64data = reader.result;
+        try {
+          localStorage.setItem(url, base64data);
+          resolve(base64data);
+        } catch (e) {
+          // If localStorage is full, clear old images
+          if (e.name === 'QuotaExceededError') {
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+              if (key.includes('markethubbackend.onrender.com')) {
+                localStorage.removeItem(key);
+              }
+            });
+            // Try again after clearing
+            localStorage.setItem(url, base64data);
+            resolve(base64data);
+          } else {
+            reject(e);
+          }
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error('Error caching image:', error);
+    return url; // Fallback to original URL if caching fails
+  }
+};
+
 const ProductCard = ({ product, contactSeller }) => {
+  const [imageStatus, setImageStatus] = useState('loading');
+  const [imageUrl, setImageUrl] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
   const [relativeTime, setRelativeTime] = useState(getRelativeTime(product.createdAt));
-  const [imageLoaded, setImageLoaded] = useState(false);
+
+  useEffect(() => {
+    const loadImage = async () => {
+      const formattedUrl = `https://markethubbackend.onrender.com/${product.image.replace(/\\/g, "/")}`;
+      try {
+        const cachedImageUrl = await cacheImage(formattedUrl);
+        setImageUrl(cachedImageUrl);
+      } catch (error) {
+        console.error('Error loading image:', error);
+        setImageUrl(formattedUrl); // Fallback to original URL
+      }
+    };
+
+    loadImage();
+  }, [product.image]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setRelativeTime(getRelativeTime(product.createdAt));
-    }, 60000); // Update every minute
-
+    }, 60000);
     return () => clearInterval(intervalId);
   }, [product.createdAt]);
 
+  const handleImageLoad = () => {
+    setImageStatus('loaded');
+    setRetryCount(0);
+  };
+
+  const handleImageError = () => {
+    if (retryCount < 3) {
+      setRetryCount(prev => prev + 1);
+      const timestamp = new Date().getTime();
+      setImageUrl(`${imageUrl}?retry=${timestamp}`);
+    } else {
+      setImageStatus('error');
+    }
+  };
+
   return (
     <div className="product-card" key={product._id}>
-     <div className="product-image">
-  <img
-    src={`https://markethubbackend.onrender.com/${product.image.replace(/\\/g, "/")}`}
-    alt={product.name}
-    onLoad={() => setImageLoaded(true)}
-    onError={(e) => {
-      e.target.src = "/fallback-image.jpg"; // Ensure this path is accessible
-    }}
-    className={imageLoaded ? "image-loaded" : "image-loading"}
-  />
-</div>
-
+      <div className={`product-image ${imageStatus}`}>
+        {imageStatus === 'loading' && (
+          <div className="image-placeholder">
+            <div className="loading-spinner"></div>
+          </div>
+        )}
+        <img
+          src={imageUrl}
+          alt={product.name}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          style={{
+            opacity: imageStatus === 'loaded' ? 1 : 0,
+            transition: 'opacity 0.3s ease-in-out'
+          }}
+        />
+        {imageStatus === 'error' && (
+          <div className="image-error">
+            <i className="fas fa-image"></i>
+            <p>Image unavailable</p>
+          </div>
+        )}
+      </div>
 
       <div className="product-info">
         <div className="price-row">
@@ -87,12 +174,40 @@ const Home = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('https://markethubbackend.onrender.com/api/products/approved');
-        setProducts(response.data);
+        // Try to get cached products first
+        const cachedProducts = localStorage.getItem('marketHubProducts');
+        const cachedTimestamp = localStorage.getItem('marketHubProductsTimestamp');
+        
+        // Check if cache is valid (less than 5 minutes old)
+        if (cachedProducts && cachedTimestamp) {
+          const isExpired = Date.now() - parseInt(cachedTimestamp) > 5 * 60 * 1000;
+          if (!isExpired) {
+            setProducts(JSON.parse(cachedProducts));
+            setLoading(false);
+            // Fetch fresh data in background
+            fetchFreshData();
+            return;
+          }
+        }
+
+        // If no valid cache, fetch fresh data
+        await fetchFreshData();
       } catch (err) {
         setError('Failed to load products. Please try again later.');
-      } finally {
         setLoading(false);
+      }
+    };
+
+    const fetchFreshData = async () => {
+      try {
+        const response = await axios.get('https://markethubbackend.onrender.com/api/products/approved');
+        setProducts(response.data);
+        // Cache the fresh data
+        localStorage.setItem('marketHubProducts', JSON.stringify(response.data));
+        localStorage.setItem('marketHubProductsTimestamp', Date.now().toString());
+        setLoading(false);
+      } catch (err) {
+        throw err;
       }
     };
 
@@ -123,14 +238,14 @@ const Home = () => {
 
         <section className="hero">
           <div className="hero-content">
-            <h1> Buy and Sell in Moi University</h1>
+            <h1>Buy and Sell in Moi University</h1>
             <p>Join us and trade your items safely and easily on your trusted marketplace platform.</p>
           </div>
         </section>
 
         <div className="seller-card">
           <div className="seller-card-content">
-            <h2> Want to Sell Your Items?</h2>
+            <h2>Want to Sell Your Items?</h2>
             <p>Create a free account and start selling to potential buyers in Moi University.</p>
             <button className="nav-btn register-btn" onClick={() => navigate('/register')}>
               <i className="fas fa-plus-circle"></i> Start Selling Today
