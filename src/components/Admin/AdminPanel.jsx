@@ -225,11 +225,11 @@ const AdminPanel = () => {
         <p>{products.length}</p>
       </div>
       <div className="summary-item">
-        <h3><i class="fa-solid fa-check"></i> Approved Products</h3>
+        <h3><i class="fas fa-check"></i> Approved Products</h3>
         <p>{approvedProducts.length}</p>
       </div>
       <div className="summary-item">
-        <h3>Rejected Products</h3>
+        <h3><i className="fas fa-ban"></i> Rejected Products</h3>
         <p>{rejectedProducts.length}</p>
         <button onClick={deleteAllRejected} className="delete-button">
         <i className="fas fa-trash-alt"></i> Delete All Rejected

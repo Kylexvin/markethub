@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './auth.css';
 
 const Login = () => {
@@ -9,7 +11,6 @@ const Login = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
 
   const navigate = useNavigate();
 
@@ -23,7 +24,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
 
     try {
       const response = await fetch('https://markethubbackend.onrender.com/api/auth/login', {
@@ -40,25 +40,49 @@ const Login = () => {
         console.log('Login successful:', data);
         localStorage.setItem('token', data.token);
         localStorage.setItem('refreshToken', data.refreshToken);
-        
-        // Update the role assignment
-        localStorage.setItem('role', data.user.role); // Ensure this line is using data.user.role
+        localStorage.setItem('role', data.user.role);
         console.log('Stored role in local storage:', localStorage.getItem('role'));
 
-        setMessage(`Welcome back, ${data.user.username}!`);
+        toast.success(`Welcome back, ${data.user.username}!`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+        });
 
-        const userRole = data.user.role; // Ensure you are fetching the role correctly
+        const userRole = data.user.role;
         const redirectPath = userRole === 'admin' ? '/admin' : '/seller-dashboard';
-        console.log('Redirecting to:', redirectPath); // Log the redirect path
+        console.log('Redirecting to:', redirectPath);
 
-        navigate(redirectPath); // Direct navigation
+        setTimeout(() => {
+          navigate(redirectPath);
+        }, 2000);
       } else {
         console.error('Login error:', data.error);
-        setMessage(`Error: ${data.error}`);
+        toast.error(data.error, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+        });
       }
     } catch (error) {
       console.error('Request error:', error);
-      setMessage('Error connecting to the server');
+      toast.error('Error connecting to the server', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "light",
+      });
     } finally {
       setLoading(false);
     }
@@ -66,13 +90,24 @@ const Login = () => {
 
   return (
     <div className="auth-container">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      
       <div className="auth-card">
         <div className="auth-header">
           <h1>Sign In</h1>
           <p>Access your account by logging in below</p>
         </div>
-
-        {message && <p className="message">{message}</p>}
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -104,15 +139,14 @@ const Login = () => {
                 required
                 className="form-input"
               />
-            <button
-  type="button"
-  onClick={() => setShowPassword(!showPassword)}
-  className="toggle-password"
-  disabled={loading}
->
-  <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`} />
-</button>
-
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="toggle-password"
+                disabled={loading}
+              >
+                <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`} />
+              </button>
             </div>
           </div>
 
@@ -126,7 +160,7 @@ const Login = () => {
 
           <div className="welcome-back">
             <p className="switch-auth">
-              Don’t have an account?{' '}
+              Don't have an account?{' '}
               <Link to="/register">Sign up</Link>{' '}
               to create a new account and start your journey with us.
             </p>

@@ -1,28 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './auth.css';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
-    phone: '254', // Prefill with '254'
+    phone: '254',
     email: '',
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Update phone number, ensuring it always starts with '254'
     if (name === "phone") {
-      const sanitizedValue = value.replace(/\D/g, ""); // Remove non-numeric characters
+      const sanitizedValue = value.replace(/\D/g, "");
       const formattedPhone = sanitizedValue.startsWith("254")
         ? sanitizedValue
-        : `254${sanitizedValue.slice(3)}`; // Prevent users from altering '254'
+        : `254${sanitizedValue.slice(3)}`;
       
       setFormData((prevFormData) => ({
         ...prevFormData,
@@ -39,7 +39,6 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage('');
 
     try {
       const response = await fetch('https://markethubbackend.onrender.com/api/auth/register', {
@@ -53,17 +52,45 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(`Registration successful! Welcome, ${formData.username}. You can now log in.`);
+        toast.success(`Registration successful! Welcome, ${formData.username}. You can now log in.`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        
         setFormData({ username: '', phone: '254', email: '', password: '' });
         
         setTimeout(() => {
           navigate('/login');
         }, 2000);
       } else {
-        setMessage(`Error: ${data.error}`);
+        toast.error(data.error, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
     } catch (error) {
-      setMessage('Error connecting to the server');
+      toast.error('Unable to connect to the server. Please try again later.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     } finally {
       setLoading(false);
     }
@@ -71,13 +98,24 @@ const Register = () => {
 
   return (
     <div className="auth-container">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      
       <div className="auth-card">
         <div className="auth-header">
           <h1>Create Account</h1>
           <p>Enter your details to get started</p>
         </div>
-
-        {message && <p className="message">{message}</p>}
 
         <form onSubmit={handleSubmit} className="auth-form">
           {/* Username Field */}
