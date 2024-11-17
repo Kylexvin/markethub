@@ -24,71 +24,8 @@ const getRelativeTime = (date) => {
   return "just now";
 };
 
-// Function to cache image as base64
-const cacheImage = async (url) => {
-  try {
-    // Check if image is already cached
-    const cachedImage = localStorage.getItem(url);
-    if (cachedImage) {
-      return cachedImage;
-    }
-
-    // Fetch and cache new image
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64data = reader.result;
-        try {
-          localStorage.setItem(url, base64data);
-          resolve(base64data);
-        } catch (e) {
-          // If localStorage is full, clear old images
-          if (e.name === 'QuotaExceededError') {
-            const keys = Object.keys(localStorage);
-            keys.forEach(key => {
-              if (key.includes('markethubbackend.onrender.com')) {
-                localStorage.removeItem(key);
-              }
-            });
-            // Try again after clearing
-            localStorage.setItem(url, base64data);
-            resolve(base64data);
-          } else {
-            reject(e);
-          }
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch (error) {
-    console.error('Error caching image:', error);
-    return url; // Fallback to original URL if caching fails
-  }
-};
-
 const ProductCard = ({ product, contactSeller }) => {
-  const [imageStatus, setImageStatus] = useState('loading');
-  const [imageUrl, setImageUrl] = useState('');
-  const [retryCount, setRetryCount] = useState(0);
   const [relativeTime, setRelativeTime] = useState(getRelativeTime(product.createdAt));
-
-  useEffect(() => {
-    const loadImage = async () => {
-      const formattedUrl = `https://markethubbackend.onrender.com/${product.image.replace(/\\/g, "/")}`;
-      try {
-        const cachedImageUrl = await cacheImage(formattedUrl);
-        setImageUrl(cachedImageUrl);
-      } catch (error) {
-        console.error('Error loading image:', error);
-        setImageUrl(formattedUrl); // Fallback to original URL
-      }
-    };
-
-    loadImage();
-  }, [product.image]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -97,45 +34,15 @@ const ProductCard = ({ product, contactSeller }) => {
     return () => clearInterval(intervalId);
   }, [product.createdAt]);
 
-  const handleImageLoad = () => {
-    setImageStatus('loaded');
-    setRetryCount(0);
-  };
-
-  const handleImageError = () => {
-    if (retryCount < 3) {
-      setRetryCount(prev => prev + 1);
-      const timestamp = new Date().getTime();
-      setImageUrl(`${imageUrl}?retry=${timestamp}`);
-    } else {
-      setImageStatus('error');
-    }
-  };
-
   return (
     <div className="product-card" key={product._id}>
-      <div className={`product-image ${imageStatus}`}>
-        {imageStatus === 'loading' && (
-          <div className="image-placeholder">
-            <div className="loading-spinner"></div>
-          </div>
-        )}
+      <div className="product-image">
+        {/* Use the product.image directly if it stores the full URL */}
         <img
-          src={imageUrl}
+          src={product.image} // Direct use of the image URL
           alt={product.name}
-          onLoad={handleImageLoad}
-          onError={handleImageError}
-          style={{
-            opacity: imageStatus === 'loaded' ? 1 : 0,
-            transition: 'opacity 0.3s ease-in-out'
-          }}
+          style={{ width: '100%', height: 'auto' }}
         />
-        {imageStatus === 'error' && (
-          <div className="image-error">
-            <i className="fas fa-image"></i>
-            <p>Image unavailable</p>
-          </div>
-        )}
       </div>
 
       <div className="product-info">
@@ -148,7 +55,7 @@ const ProductCard = ({ product, contactSeller }) => {
           </div>
         </div>
         <div className="product-description">
-          <b><i className="fas fa-info-circle"></i> Description:</b><br/>
+          <b><i className="fas fa-info-circle"></i> Description:</b><br />
           <p className="product-description">{product.description}</p>
         </div>
         <div className="seller-info">
@@ -254,7 +161,7 @@ const Home = () => {
         </div>
 
         <div className="container">
-          <h2 className="section-title">Product for you</h2>
+          <h2 className="section-title">Products for You</h2>
           <div className="products-grid">
             {loading ? (
               <p><i className="fas fa-spinner fa-spin"></i> Loading products...</p>
