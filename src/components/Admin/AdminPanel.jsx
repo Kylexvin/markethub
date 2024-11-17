@@ -16,22 +16,22 @@ const AdminPanel = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const productResponse = await fetch('http://localhost:5000/api/admin/products/pending', {
+        const productResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/pending', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const approvedProductResponse = await fetch('http://localhost:5000/api/admin/products/approved', {
+        const approvedProductResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/approved', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const rejectedProductResponse = await fetch('http://localhost:5000/api/admin/products/rejected', {
+        const rejectedProductResponse = await fetch('https://markethubbackend.onrender.com/api/admin/products/rejected', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-        const userResponse = await fetch('http://localhost:5000/api/admin/users', {
+        const userResponse = await fetch('https://markethubbackend.onrender.com/api/admin/users', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -59,7 +59,7 @@ const AdminPanel = () => {
   // Function to delete all rejected products
   const deleteAllRejected = async () => {
     try {
-      await fetch('http://localhost:5000/api/admin/products/rejected', {
+      await fetch('https://markethubbackend.onrender.com/api/admin/products/rejected', {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -74,7 +74,7 @@ const AdminPanel = () => {
   };
   const handleApprove = async (productId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/products/${productId}`, {
+      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
