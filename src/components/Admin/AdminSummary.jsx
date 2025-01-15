@@ -49,13 +49,13 @@ const AdminSummary = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-800">Overview</h2>
-        <button 
+        {/* <button 
           onClick={deleteAllRejected}
           className="px-4 py-2 bg-red-500 text-white rounded-lg flex items-center gap-2 hover:bg-red-600 transition-colors duration-200"
         >
           <Trash2 className="w-4 h-4" />
           Delete Rejected
-        </button>
+        </button> */} 
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">

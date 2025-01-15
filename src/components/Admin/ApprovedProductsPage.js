@@ -5,10 +5,7 @@ import ApprovedProducts from './ApprovedProducts';
 
 const ApprovedProductsPage = () => {
   return (
-    <div className="admin-container">
-      <div className="admin-header">
-        <h1>Approved Products</h1>
-      </div>
+    <div className="admin-container">    
       <ApprovedProducts />
     </div>
   );

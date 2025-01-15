@@ -5,10 +5,7 @@ import RejectedProducts from './RejectedProducts';
 
 const RejectedProductsPage = () => {
   return (
-    <div className="admin-container">
-      <div className="admin-header">
-        <h1>Rejected Products</h1>
-      </div>
+    <div className="admin-container">      
       <RejectedProducts />
     </div>
   );
