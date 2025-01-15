@@ -1,0 +1,64 @@
+.summary-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+  }
+  
+  .summary-item {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    width: 200px;
+  }
+  
+  .summary-item h3 {
+    margin: 0;
+    font-size: 18px;
+  }
+  
+  .summary-item p {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+  
+  .delete-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .delete-button i {
+    margin-right: 5px;
+  }
+  
+  .delete-button:hover {
+    background-color: #c0392b;
+  }
+  
+  .view-details-link {
+    display: block;
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .view-details-link:hover {
+    background-color: #2980b9;
+  }

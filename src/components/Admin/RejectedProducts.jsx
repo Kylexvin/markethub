@@ -1,19 +1,19 @@
 import React, { useContext } from 'react';
 import { AdminPanelContext } from './AdminPanelProvider';
 
-const ApprovedProducts = () => {
-  const { approvedProducts, handleReject } = useContext(AdminPanelContext);
+const RejectedProducts = () => {
+  const { rejectedProducts, handleReapprove, handleDelete } = useContext(AdminPanelContext);
 
   return (
-    <div className="approved-products" id="approved-products">
-      <h2>Approved Products</h2>
-      {approvedProducts.length === 0 ? (
+    <div className="rejected-products" id="rejected-products">
+      <h2>Rejected Products</h2>
+      {rejectedProducts.length === 0 ? (
         <div className="empty-state">
-          <p>No approved products</p>
+          <p>No rejected products</p>
         </div>
       ) : (
         <div className="products-grid">
-          {approvedProducts.map((product) => (
+          {rejectedProducts.map((product) => (
             <div key={product._id} className="product-card">
               <div className="product-image">
                 <img src={product.image} alt={product.name} />
@@ -24,8 +24,11 @@ const ApprovedProducts = () => {
                 <p className="description">{product.description}</p>
               </div>
               <div className="product-actions">
-                <button onClick={() => handleReject(product._id)} className="reject-btn">
-                  <i className="fas fa-times"></i> Reject
+                <button onClick={() => handleReapprove(product._id)} className="approve-btn">
+                  <i className="fas fa-check"></i> Reapprove
+                </button>
+                <button onClick={() => handleDelete(product._id)} className="delete-btn">
+                  <i className="fas fa-trash-alt"></i> Delete
                 </button>
               </div>
             </div>
@@ -36,4 +39,4 @@ const ApprovedProducts = () => {
   );
 };
 
-export default ApprovedProducts;
+export default RejectedProducts;

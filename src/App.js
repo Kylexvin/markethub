@@ -4,32 +4,61 @@ import Home from './pages/Home';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import SellerDashboard from './components/User/SellerDashboard';
-import AdminPanel from './components/Admin/AdminPanel';
+import AdminLandingPage from './components/Admin/AdminLandingPage';
+import PendingProductsPage from './components/Admin/PendingProductsPage';
+import ApprovedProductsPage from './components/Admin/ApprovedProductsPage';
+import RejectedProductsPage from './components/Admin/RejectedProductsPage';
+import UserManagementPage from './components/Admin/UserManagementPage';
+import { AdminPanelProvider } from './components/Admin/AdminPanelProvider';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        
-        {/* Use ProtectedRoute for Seller Dashboard */}
         <Route path="/seller-dashboard" element={
           <ProtectedRoute>
             <SellerDashboard />
           </ProtectedRoute>
         } />
-
-        {/* Use ProtectedRoute for Admin Panel and Product Approval */}
         <Route path="/admin" element={
           <ProtectedRoute isAdmin>
-            <AdminPanel />
+            <AdminPanelProvider>
+              <AdminLandingPage />
+            </AdminPanelProvider>
           </ProtectedRoute>
         } />
-
-       
+        <Route path="/admin/pending-products" element={
+          <ProtectedRoute isAdmin>
+            <AdminPanelProvider>
+              <PendingProductsPage />
+            </AdminPanelProvider>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/approved-products" element={
+          <ProtectedRoute isAdmin>
+            <AdminPanelProvider>
+              <ApprovedProductsPage />
+            </AdminPanelProvider>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/rejected-products" element={
+          <ProtectedRoute isAdmin>
+            <AdminPanelProvider>
+              <RejectedProductsPage />
+            </AdminPanelProvider>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/user-management" element={
+          <ProtectedRoute isAdmin>
+            <AdminPanelProvider>
+              <UserManagementPage />
+            </AdminPanelProvider>
+          </ProtectedRoute>
+        } />
+        <Route path="/" element={<Home />} />
       </Routes>
     </div>
   );
