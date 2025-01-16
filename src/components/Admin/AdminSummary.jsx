@@ -8,7 +8,7 @@ const AdminSummary = () => {
 
   const stats = [
     {
-      title: "Total Users",
+      title: "Total Sellers",
       value: users.length,
       icon: Users,
       color: "bg-blue-500",

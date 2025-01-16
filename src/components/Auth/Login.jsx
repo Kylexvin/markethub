@@ -41,7 +41,7 @@ const Login = () => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('refreshToken', data.refreshToken);
         localStorage.setItem('role', data.user.role);
-        console.log('Stored role in local storage:', localStorage.getItem('role'));
+        localStorage.setItem('username', data.user.username); // Store username in local storage
 
         toast.success(`Welcome back, ${data.user.username}!`, {
           position: "top-right",
@@ -102,7 +102,7 @@ const Login = () => {
         pauseOnHover
         theme="light"
       />
-      
+
       <div className="auth-card">
         <div className="auth-header">
           <h1>Sign In</h1>
@@ -153,7 +153,7 @@ const Login = () => {
           <button 
             type="submit" 
             className={`submit-button ${loading ? 'loading' : ''}`}
-            disabled={loading}
+            disabled={loading }
           >
             {loading ? 'Logging In...' : 'Sign In'}
           </button>
@@ -162,7 +162,7 @@ const Login = () => {
             <p className="switch-auth">
               Don't have an account?{' '}
               <Link to="/register">Sign up</Link>{' '}
-              to create a new account and start your journey with us.
+              to create a new account and start your journey with us. 
             </p>
           </div>
         </form>
