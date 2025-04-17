@@ -204,7 +204,7 @@ const SellerDashboard = () => {
   const deleteProduct = async (productId) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.delete(`https://markethubbackend.onrender.com/api/products/delete/${productId}`, {
+      const response = await axios.delete(`http://localhost:5000/api/products/delete/${productId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
