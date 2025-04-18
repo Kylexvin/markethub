@@ -123,7 +123,7 @@ const AdminPanelProvider = ({ children }) => {
 
   const handleReapprove = async (productId) => {
     try {
-      await fetch(`https://markethubbackend.onrender.com/api/admin products/${productId}`, {
+      await fetch(`https://markethubbackend.onrender.com/api/admin/products/${productId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
